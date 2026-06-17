@@ -1,0 +1,57 @@
+<ng-container *ngIf="previewUrl; else uploadPrompt">
+  <div class="relative rounded-2xl overflow-hidden border border-slate-200 bg-white/80 flex flex-col items-center justify-center p-2 group shadow-sm">
+    <div class="relative w-full max-h-72 flex items-center justify-center overflow-hidden rounded-xl">
+      <img [src]="previewUrl" alt="MyKad preview" class="max-h-72 object-contain w-full select-none" />
+      
+      <!-- Scanline overlay -->
+      <div *ngIf="!ocrResults" class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60 scan-line"></div>
+
+      <!-- Bounding boxes -->
+      <ng-container *ngIf="ocrResults">
+        <div *ngFor="let res of ocrResults"
+             (mouseenter)="onMouseEnterBox(res.text)"
+             (mouseleave)="onMouseLeaveBox()"
+             class="absolute border rounded-[2px] transition-all duration-150 cursor-help"
+             [ngClass]="{
+               'border-indigo-400 bg-indigo-500/25 ring-2 ring-indigo-400/20 scale-105 z-20': hoveredText === res.text,
+               'border-emerald-500/30 bg-emerald-500/5 hover:border-indigo-400 hover:bg-indigo-500/15 z-10': hoveredText !== res.text
+             }"
+             [ngStyle]="{
+               'left': res.box.x + '%',
+               'top': res.box.y + '%',
+               'width': res.box.width + '%',
+               'height': res.box.height + '%'
+             }"
+             [title]="res.text + ' (' + res.confidence + '%)'">
+        </div>
+      </ng-container>
+    </div>
+
+    <span class="absolute top-4 left-4 text-[10px] px-2.5 py-1 rounded-full bg-white/95 border border-slate-200 text-slate-600 font-medium tracking-wide shadow-sm">
+      MyKad Document
+    </span>
+    <button (click)="onClear()" aria-label="Remove image"
+            class="absolute top-4.5 right-4 w-7 h-7 rounded-full bg-white/90 border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95">
+      <lucide-icon [img]="X" class="w-4 h-4"></lucide-icon>
+    </button>
+  </div>
+</ng-container>
+
+<ng-template #uploadPrompt>
+  <div (click)="triggerFileInput()"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave()"
+       (drop)="onDrop($event)"
+       class="rounded-2xl border-2 border-dashed px-8 py-14 text-center cursor-pointer transition-all duration-300"
+       [ngClass]="{
+         'border-indigo-500 bg-indigo-50/50 scale-[0.99] shadow-inner': dragOver,
+         'border-slate-300 hover:border-slate-400 bg-white/40 hover:bg-white/60': !dragOver
+       }">
+    <div class="flex justify-center mb-3">
+      <lucide-icon [img]="ImagePlus" class="w-10 h-10 text-slate-400 animate-bounce"></lucide-icon>
+    </div>
+    <p class="text-sm text-slate-800 font-semibold">Drop identity card image here</p>
+    <p class="text-xs text-slate-500 mt-1.5">or click to browse from system · JPG, PNG, WEBP</p>
+    <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileChange($event)" />
+  </div>
+</ng-template>

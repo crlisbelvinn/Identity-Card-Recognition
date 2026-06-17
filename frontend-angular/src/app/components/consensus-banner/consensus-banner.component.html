@@ -1,0 +1,14 @@
+<div *ngIf="consensus"
+     class="flex items-center gap-3 text-xs px-4 py-3 rounded-xl border shadow-sm"
+     [ngClass]="consensus.agreement ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'">
+  <lucide-icon *ngIf="consensus.agreement" [img]="CheckCircle2" class="w-4 h-4"></lucide-icon>
+  <lucide-icon *ngIf="!consensus.agreement" [img]="AlertTriangle" class="w-4 h-4"></lucide-icon>
+  <span class="font-semibold tracking-wide">
+    <ng-container *ngIf="consensus.agreement">
+      Consensus Achieved — All systems matched IC: {{consensus.nomor_ic}}
+    </ng-container>
+    <ng-container *ngIf="!consensus.agreement">
+      Consensus Mismatch — Systems returned differing IC values. Review manually.
+    </ng-container>
+  </span>
+</div>
